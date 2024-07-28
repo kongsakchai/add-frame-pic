@@ -20,10 +20,23 @@
 
     const file = input.files[0];
     url = URL.createObjectURL(file);
+
   };
 
   const saveFile = () => {
-    toPng(imageDom)
+    let w=1024;
+    let h=1024;
+    const image = new Image()
+    image.onload = () => {
+      w = image.width;
+      h = image.height;
+
+    }
+
+    toPng(imageDom,{
+      "width":w,
+      "height":h,
+    })
       .then((blob) => {
         saveAs(blob, `saved-${Date.now()}.png`);
       })
