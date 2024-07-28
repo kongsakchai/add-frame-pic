@@ -1,47 +1,69 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+  import { onMount } from "svelte";
+  import "./app.css";
+  import InputRange from "./components/InputRange.svelte";
+  import { saveAs } from "file-saver";
+  import { toPng } from "html-to-image";
+
+  let url = "";
+  let value = 0;
+  let x = 0;
+  let y = 0;
+
+  let inputFile: HTMLInputElement;
+  let imageDom: HTMLElement;
+
+  const onFileChange = (e: Event) => {
+    console.log("onFileChange");
+    const input = e.target as HTMLInputElement;
+    if (!input.files) return;
+
+    const file = input.files[0];
+    url = URL.createObjectURL(file);
+  };
+
+  const saveFile = () => {
+    toPng(imageDom)
+      .then((blob) => {
+        saveAs(blob, `saved-${Date.now()}.png`);
+      })
+      .catch(function (error) {
+        console.error("oops, something went wrong!", error);
+      });
+  };
+
+  const saveBorder = () => {
+    localStorage.setItem("add-pic-fame.border", value.toString());
+  };
+
+  onMount(() => {
+    const border = localStorage.getItem("add-pic-fame.border");
+    if (border) {
+      value = parseInt(border);
+    } else {
+      value = 0;
+    }
+  });
 </script>
 
-<main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+<main class=" min-h-[100vh] flex flex-col place-content-center gap-6 p-6">
+  <section class="mx-auto">
+    <div bind:this={imageDom} class=" aspect-square md:w-[600px] w-[300px] bg-white" style="padding: {value}px;">
+      <div class="bg-neutral-600 w-full h-full overflow-hidden">
+        <img src={url} alt="img" class=" object-cover w-full h-full" style="object-position: {x}% {y}%;" />
+      </div>
+    </div>
+  </section>
 
-  <div class="card">
-    <Counter />
-  </div>
+  <input bind:this={inputFile} type="file" accept="image/*" hidden on:change={onFileChange} />
 
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
+  <section class="mx-auto w-[300px] flex flex-col gap-4">
+    <InputRange bind:value title="Border" onChange={() => saveBorder()} />
+    <InputRange bind:value={x} title="X" />
+    <InputRange bind:value={y} title="Y" />
+    <button class=" w-[300px] h-[60px] bg-blue-300 font-semibold" on:click={() => inputFile.click()}>
+      Upload Image
+    </button>
+    <button class=" w-[300px] h-[60px] bg-blue-300 font-semibold" on:click={saveFile}> Save Image </button>
+  </section>
 </main>
-
-<style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
-</style>
