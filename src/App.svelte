@@ -61,10 +61,12 @@
 
 <main class=" min-h-[100vh] flex flex-col place-content-center gap-6 p-6">
   <section class="mx-auto">
-    <div bind:this={imageDom} class=" aspect-square md:w-[600px] w-[300px] bg-white" style="padding: {value}px;">
+    <div class="aspect-square md:w-[600px] w-[300px]">
+    <div bind:this={imageDom} class=" w-full h-full bg-white" style="padding: {value}px;">
       <div class="bg-neutral-600 w-full h-full overflow-hidden">
         <img src={url} alt="img" class=" object-cover w-full h-full" style="object-position: {x}% {y}%;" />
       </div>
+    </div>
     </div>
   </section>
 
