@@ -20,22 +20,21 @@
 
     const file = input.files[0];
     url = URL.createObjectURL(file);
-
   };
 
   const saveFile = () => {
-    let w=1024;
-    let h=1024;
-    const image = new Image()
+    let scale = 1024;
+    const image = new Image();
     image.onload = () => {
-      w = image.width;
-      h = image.height;
+      scale = image.width;
+      if (scale > image.height) {
+        scale = image.height;
+      }
+    };
 
-    }
-
-    toPng(imageDom,{
-      "width":w,
-      "height":h,
+    toPng(imageDom, {
+      canvasHeight: scale,
+      canvasWidth: scale,
     })
       .then((blob) => {
         saveAs(blob, `saved-${Date.now()}.png`);
@@ -61,12 +60,10 @@
 
 <main class=" min-h-[100vh] flex flex-col place-content-center gap-6 p-6">
   <section class="mx-auto">
-    <div class="aspect-square md:w-[600px] w-[300px]">
-    <div bind:this={imageDom} class=" w-full h-full bg-white" style="padding: {value}px;">
+    <div bind:this={imageDom} class="aspect-square md:w-[600px] w-[300px] bg-white" style="padding: {value}px;">
       <div class="bg-neutral-600 w-full h-full overflow-hidden">
         <img src={url} alt="img" class=" object-cover w-full h-full" style="object-position: {x}% {y}%;" />
       </div>
-    </div>
     </div>
   </section>
 
